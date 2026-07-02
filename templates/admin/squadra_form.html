@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{% if modalita == 'nuova' %}Nuova squadra{% else %}Modifica squadra{% endif %} – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>{% if modalita == 'nuova' %}Nuova squadra{% else %}Modifica {{ sq.nome }}{% endif %}</h2>
+
+<div class="card" style="max-width:560px">
+  <form method="post">
+    <div class="form-row">
+      <div>
+        <label>Nome *</label>
+        <input type="text" name="nome" required value="{{ sq.nome if sq else '' }}">
+      </div>
+      <div>
+        <label>Città *</label>
+        <input type="text" name="citta" required value="{{ sq.citta if sq else '' }}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Stadio</label>
+        <input type="text" name="stadio" value="{{ sq.stadio if sq else '' }}">
+      </div>
+      <div>
+        <label>Anno fondazione</label>
+        <input type="number" name="anno_fondazione" min="1850" max="2026" style="width:110px" value="{{ sq.anno_fondazione if sq else '' }}">
+      </div>
+      <div>
+        <label>Colore primario</label>
+        <input type="color" name="colore_primario" value="{{ sq.colore_primario if sq else '#1a2e23' }}">
+      </div>
+    </div>
+    <button type="submit" class="btn">{% if modalita == 'nuova' %}Crea squadra{% else %}Salva modifiche{% endif %}</button>
+    <a href="{{ url_for('admin_squadre') }}" class="btn btn-secondary">Annulla</a>
+  </form>
+</div>
+{% endblock %}

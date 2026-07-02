@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ pt.sq_casa }} vs {{ pt.sq_ospite }} – Gestione{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>{{ pt.sq_casa }} <span class="score">{{ pt.gol_casa }} – {{ pt.gol_ospiti }}</span> {{ pt.sq_ospite }}</h2>
+<p style="color:var(--muted);margin-bottom:1.5rem">
+  {{ pt.data }} · Giornata {{ pt.giornata }} · {{ pt.stage_label }}
+  {% if pt.arbitro %} · Arbitro: {{ pt.arbitro }}{% endif %}
+</p>
+
+<div class="actions-row">
+  <form method="post" action="{{ url_for('admin_partita_elimina', pid=pt.id) }}"
+        onsubmit="return confirm('Eliminare questa partita e tutte le statistiche collegate? Azione irreversibile.');">
+    <button type="submit" class="btn btn-danger btn-sm">Elimina partita</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Tabellino ({{ statistiche|length }} giocatori)</h3>
+  {% if statistiche %}
+  <table>
+    <thead>
+      <tr>
+        <th>Giocatore</th><th>Squadra</th>
+        <th class="num">Min</th><th class="num">G</th><th class="num">A</th>
+        <th class="num">Amm.</th><th class="num">Esp.</th>
+        <th class="num">Tiri</th><th class="num">xG</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in statistiche %}
+      <tr>
+        <td>{{ s.nome }} {{ s.cognome }}</td>
+        <td>{{ s.squadra }}</td>
+        <td class="num">{{ s.minuti }}</td>
+        <td class="num">{{ s.gol }}</td>
+        <td class="num">{{ s.assist }}</td>
+        <td class="num">{{ '●' if s.cartellini_gialli else '' }}</td>
+        <td class="num">{{ '●' if s.cartellini_rossi else '' }}</td>
+        <td class="num">{{ s.tiri }}</td>
+        <td class="num">{{ s.xG }}</td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('admin_statistica_modifica', pid=pt.id, stat_id=s.id) }}" class="btn btn-secondary btn-sm">Modifica</a>
+          <form method="post" action="{{ url_for('admin_statistica_elimina', pid=pt.id, stat_id=s.id) }}" style="display:inline"
+                onsubmit="return confirm('Rimuovere questa riga dal tabellino?');">
+            <button type="submit" class="btn btn-danger btn-sm">×</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">Nessuna statistica inserita finora.</p>
+  {% endif %}
+</div>
+
+{% if disponibili %}
+<div class="card">
+  <h3>Aggiungi statistica</h3>
+  <p class="field-hint" style="margin-bottom:0.75rem">
+    Il menu propone solo giocatori tesserati (Rosa) con una delle due squadre in questa stagione e non ancora presenti nel tabellino —
+    lo stesso vincolo è comunque imposto anche a livello di database dal trigger <code>trg_statistica_rosa_check</code>.
+  </p>
+  <form method="post" action="{{ url_for('admin_statistica_nuova', pid=pt.id) }}">
+    <div class="form-row">
+      <div>
+        <label>Giocatore *</label>
+        <select name="id_giocatore" required style="min-width:220px">
+          {% for g in disponibili %}
+          <option value="{{ g.id }}">{{ g.nome }} {{ g.cognome }} — {{ g.squadra }} ({{ g.ruolo }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div><label>Min</label><input type="number" name="minuti" min="0" max="120" value="90" style="width:70px"></div>
+      <div><label>Gol</label><input type="number" name="gol" min="0" value="0" style="width:60px"></div>
+      <div><label>Assist</label><input type="number" name="assist" min="0" value="0" style="width:60px"></div>
+      <div><label><input type="checkbox" name="cartellini_gialli" value="1"> Giallo</label></div>
+      <div><label><input type="checkbox" name="cartellini_rossi" value="1"> Rosso</label></div>
+    </div>
+    <div class="form-row">
+      <div><label>Tiri</label><input type="number" name="tiri" min="0" value="0" style="width:60px"></div>
+      <div><label>Tiri in porta</label><input type="number" name="tiri_in_porta" min="0" value="0" style="width:70px"></div>
+      <div><label>Passaggi</label><input type="number" name="passaggi" min="0" value="0" style="width:70px"></div>
+      <div><label>Pass. riusciti</label><input type="number" name="passaggi_riusciti" min="0" value="0" style="width:70px"></div>
+      <div><label>Dribbling</label><input type="number" name="dribbling_riusciti" min="0" value="0" style="width:70px"></div>
+      <div><label>Contrasti</label><input type="number" name="contrasti" min="0" value="0" style="width:70px"></div>
+      <div><label>Intercetti</label><input type="number" name="intercetti" min="0" value="0" style="width:70px"></div>
+      <div><label>xG</label><input type="number" name="xG" min="0" max="1" step="0.01" value="0" style="width:70px"></div>
+      <button type="submit" class="btn">Aggiungi</button>
+    </div>
+  </form>
+</div>
+{% else %}
+<p class="empty">Tutti i giocatori tesserati con le due squadre sono già stati inseriti nel tabellino.</p>
+{% endif %}
+{% endblock %}

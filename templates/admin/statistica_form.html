@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Modifica statistica – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Modifica statistica — {{ stat.nome }} {{ stat.cognome }}</h2>
+
+<div class="card" style="max-width:640px">
+  <form method="post">
+    <div class="form-row">
+      <div><label>Minuti</label><input type="number" name="minuti" min="0" max="120" value="{{ stat.minuti }}" style="width:70px"></div>
+      <div><label>Gol</label><input type="number" name="gol" min="0" value="{{ stat.gol }}" style="width:60px"></div>
+      <div><label>Assist</label><input type="number" name="assist" min="0" value="{{ stat.assist }}" style="width:60px"></div>
+      <div><label><input type="checkbox" name="cartellini_gialli" value="1" {% if stat.cartellini_gialli %}checked{% endif %}> Giallo</label></div>
+      <div><label><input type="checkbox" name="cartellini_rossi" value="1" {% if stat.cartellini_rossi %}checked{% endif %}> Rosso</label></div>
+    </div>
+    <div class="form-row">
+      <div><label>Tiri</label><input type="number" name="tiri" min="0" value="{{ stat.tiri }}" style="width:60px"></div>
+      <div><label>Tiri in porta</label><input type="number" name="tiri_in_porta" min="0" value="{{ stat.tiri_in_porta }}" style="width:70px"></div>
+      <div><label>Passaggi</label><input type="number" name="passaggi" min="0" value="{{ stat.passaggi }}" style="width:70px"></div>
+      <div><label>Pass. riusciti</label><input type="number" name="passaggi_riusciti" min="0" value="{{ stat.passaggi_riusciti }}" style="width:70px"></div>
+      <div><label>Dribbling</label><input type="number" name="dribbling_riusciti" min="0" value="{{ stat.dribbling_riusciti }}" style="width:70px"></div>
+      <div><label>Contrasti</label><input type="number" name="contrasti" min="0" value="{{ stat.contrasti }}" style="width:70px"></div>
+      <div><label>Intercetti</label><input type="number" name="intercetti" min="0" value="{{ stat.intercetti }}" style="width:70px"></div>
+      <div><label>xG</label><input type="number" name="xG" min="0" max="1" step="0.01" value="{{ stat.xG }}" style="width:70px"></div>
+    </div>
+    <button type="submit" class="btn">Salva modifiche</button>
+    <a href="{{ url_for('admin_partita_dettaglio', pid=pid) }}" class="btn btn-secondary">Annulla</a>
+  </form>
+</div>
+{% endblock %}

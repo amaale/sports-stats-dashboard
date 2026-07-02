@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Nuova partita – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Nuova partita</h2>
+
+<div class="card" style="max-width:640px">
+  <form method="post">
+    <div class="form-row">
+      <div>
+        <label>Stagione *</label>
+        <select name="stagione" required>
+          {% for s in all_stagioni %}
+          <option value="{{ s.id }}" {% if s.id == stagione_corrente.id %}selected{% endif %}>{{ s.anno_inizio }}/{{ '%02d'|format(s.anno_fine % 100) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Giornata *</label>
+        <input type="number" name="giornata" min="1" required style="width:90px" value="1">
+      </div>
+      <div>
+        <label>Data *</label>
+        <input type="date" name="data" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Squadra in casa *</label>
+        <select name="sq_casa" required>
+          {% for s in squadre %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Gol casa</label>
+        <input type="number" name="gol_casa" min="0" style="width:80px" value="0">
+      </div>
+      <div>
+        <label>Squadra ospite *</label>
+        <select name="sq_ospite" required>
+          {% for s in squadre %}<option value="{{ s.id }}">{{ s.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Gol ospite</label>
+        <input type="number" name="gol_ospiti" min="0" style="width:80px" value="0">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div>
+        <label>Spettatori</label>
+        <input type="number" name="spettatori" min="0" style="width:120px">
+      </div>
+      <div>
+        <label>Arbitro</label>
+        <input type="text" name="arbitro">
+      </div>
+    </div>
+
+    <button type="submit" class="btn">Crea partita</button>
+    <a href="{{ url_for('admin_partite') }}" class="btn btn-secondary">Annulla</a>
+  </form>
+  <p class="field-hint" style="margin-top:1rem">Dopo la creazione potrai compilare il tabellino (statistiche per giocatore) nella pagina di dettaglio.</p>
+</div>
+{% endblock %}

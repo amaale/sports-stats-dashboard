@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Confronto – Sports Stats{% endblock %}
+{% block content %}
+<h2>Confronto diretto</h2>
+
+<form class="form-row" method="get">
+  <div>
+    <label>Squadra 1</label>
+    <select name="sq1">
+      <option value="">— seleziona —</option>
+      {% for s in tutte %}
+      <option value="{{ s.id }}" {% if sq1_id == s.id %}selected{% endif %}>{{ s.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label>Squadra 2</label>
+    <select name="sq2">
+      <option value="">— seleziona —</option>
+      {% for s in tutte %}
+      <option value="{{ s.id }}" {% if sq2_id == s.id %}selected{% endif %}>{{ s.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit">Confronta</button>
+</form>
+
+{% if sq1 and sq2 and h2h %}
+<div class="stats-row">
+  <div class="stat-box"><div class="val">{{ h2h.totale }}</div><div class="lbl">Partite totali</div></div>
+  <div class="stat-box"><div class="val">{{ h2h.v1 }} – {{ h2h.pareggi }} – {{ h2h.v2 }}</div><div class="lbl">{{ sq1.nome }} – Pareggi – {{ sq2.nome }}</div></div>
+  <div class="stat-box"><div class="val">{{ h2h.gf1 }} : {{ h2h.gf2 }}</div><div class="lbl">Gol fatti</div></div>
+</div>
+
+<div class="card">
+  <h3>Storico incontri</h3>
+  <table>
+    <thead><tr><th>Data</th><th>Stagione</th><th>Partita</th><th class="num">Ris.</th></tr></thead>
+    <tbody>
+      {% for p in risultati %}
+      <tr>
+        <td>{{ p.data }}</td>
+        <td>{{ p.stagione }}</td>
+        <td><a href="{{ url_for('partita', pid=p.id) }}">{{ p.sq_casa }} – {{ p.sq_ospite }}</a></td>
+        <td class="num score">{{ p.gol_casa }}–{{ p.gol_ospiti }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">Nessun incontro.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif sq1_id and sq2_id %}
+<p class="empty">Seleziona due squadre diverse.</p>
+{% endif %}
+{% endblock %}

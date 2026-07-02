@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}{{ g.nome }} {{ g.cognome }} – Sports Stats{% endblock %}
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+{% endblock %}
+{% block content %}
+<h2>{{ g.nome }} {{ g.cognome }}</h2>
+<p style="color:var(--muted);margin-bottom:1rem">
+  {{ g.ruolo }} · {{ g.nazionalita or '—' }} · {{ g.piede_preferito or '—' }} · {{ g.altezza_cm or '—' }} cm
+  {% if sq_corrente %} · <span class="dot" style="background:{{ sq_corrente.colore_primario }}"></span>{{ sq_corrente.nome }} #{{ sq_corrente.numero_maglia or '—' }}{% endif %}
+</p>
+
+{% if storia %}
+<div class="card">
+  <h3>Profilo statistico — {{ storia[0].label }}
+    <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">(via /api/giocatore/…/radar – JSON, normalizzato 0–100 sul massimo di lega)</span>
+  </h3>
+  <canvas id="radar-chart" height="260" style="max-width:460px;margin:0 auto;display:block"></canvas>
+</div>
+
+<div class="card">
+  <h3>Carriera per stagione</h3>
+  <canvas id="chart" height="80"></canvas>
+  <table style="margin-top:1rem">
+    <thead>
+      <tr><th>Stagione</th><th>Squadra</th><th class="num">Pres.</th><th class="num">Gol</th><th class="num">Assist</th><th class="num">xG</th></tr>
+    </thead>
+    <tbody>
+      {% for s in storia %}
+      <tr>
+        <td>{{ s.label }}</td>
+        <td><a href="{{ url_for('squadra', sid=s.id_sq) }}">{{ s.squadra }}</a></td>
+        <td class="num">{{ s.presenze }}</td>
+        <td class="num">{{ s.gol }}</td>
+        <td class="num">{{ s.assist }}</td>
+        <td class="num">{{ s.xg }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Ultime partite</h3>
+  <table>
+    <thead><tr><th>Data</th><th>Partita</th><th class="num">Min</th><th class="num">G</th><th class="num">A</th><th class="num">xG</th></tr></thead>
+    <tbody>
+      {% for u in ultime %}
+      <tr>
+        <td>{{ u.data }}</td>
+        <td><a href="{{ url_for('partita', pid=u.id) }}">{{ u.sq_casa }} {{ u.gol_casa }}–{{ u.gol_ospiti }} {{ u.sq_ospite }}</a></td>
+        <td class="num">{{ u.minuti }}</td>
+        <td class="num">{{ u.gol }}</td>
+        <td class="num">{{ u.assist }}</td>
+        <td class="num">{{ u.xG }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">Nessuna partita.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+const labels = {{ chart_labels|safe }};
+const gol = {{ chart_gol|safe }};
+const assist = {{ chart_assist|safe }};
+if (labels.length) {
+  new Chart(document.getElementById('chart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Gol', data: gol, backgroundColor: '#3ecf8e' },
+        { label: 'Assist', data: assist, backgroundColor: '#60a5fa' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#e8edf4' } } },
+      scales: {
+        x: { ticks: { color: '#8b9cb3' }, grid: { color: '#2d3a4f' } },
+        y: { ticks: { color: '#8b9cb3' }, grid: { color: '#2d3a4f' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+{% if storia %}
+// Profilo statistico: dati caricati in modo asincrono dall'API JSON,
+// cosi' la stessa rotta puo' essere riusata da qualunque altro client
+// (non solo da questa pagina) — vedi /api/giocatore/<id>/radar.
+fetch('{{ url_for("api_radar", gid=g.id) }}?stagione={{ storia[0].id_stagione }}')
+  .then(r => r.json())
+  .then(d => {
+    new Chart(document.getElementById('radar-chart'), {
+      type: 'radar',
+      data: {
+        labels: ['Tiri', 'Precisione passaggi', 'Dribbling', 'Contrasti', 'Intercetti', 'Gol/presenza'],
+        datasets: [{
+          label: '{{ g.nome }} {{ g.cognome }}',
+          data: [d.tiri, d.accuratezza_passaggi, d.dribbling, d.contrasti, d.intercetti, d.gol_per_presenza],
+          backgroundColor: 'rgba(62,207,142,0.25)',
+          borderColor: '#3ecf8e',
+          pointBackgroundColor: '#3ecf8e'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#e8edf4' } } },
+        scales: {
+          r: {
+            angleLines: { color: '#2d3a4f' },
+            grid: { color: '#2d3a4f' },
+            pointLabels: { color: '#8b9cb3', font: { size: 11 } },
+            ticks: { display: false, stepSize: 25 },
+            suggestedMin: 0, suggestedMax: 100
+          }
+        }
+      }
+    });
+  });
+{% endif %}
+</script>
+{% endblock %}

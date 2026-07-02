@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Gestione giocatori – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Giocatori</h2>
+<div class="actions-row">
+  <a href="{{ url_for('admin_giocatore_nuovo') }}" class="btn">+ Nuovo giocatore</a>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th><th>Ruolo</th><th>Nazionalità</th><th>Squadra attuale</th>
+        <th class="num">Altezza</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in giocatori %}
+      <tr>
+        <td>{{ g.nome }} {{ g.cognome }}</td>
+        <td>{{ g.ruolo }}</td>
+        <td>{{ g.nazionalita or '—' }}</td>
+        <td>{{ g.squadra_attuale or '—' }}</td>
+        <td class="num">{{ g.altezza_cm or '—' }}</td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('admin_giocatore_modifica', gid=g.id) }}" class="btn btn-secondary btn-sm">Modifica</a>
+          <form method="post" action="{{ url_for('admin_giocatore_elimina', gid=g.id) }}" style="display:inline"
+                onsubmit="return confirm('Eliminare {{ g.nome }} {{ g.cognome }}? Verranno rimosse anche rosa e statistiche collegate. Azione irreversibile.');">
+            <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">Nessun giocatore.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

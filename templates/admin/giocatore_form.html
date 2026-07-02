@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{% if modalita == 'nuovo' %}Nuovo giocatore{% else %}Modifica giocatore{% endif %} – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>{% if modalita == 'nuovo' %}Nuovo giocatore{% else %}Modifica {{ giocatore.nome }} {{ giocatore.cognome }}{% endif %}</h2>
+
+<div class="card" style="max-width:640px">
+  <form method="post">
+    <fieldset>
+      <legend>Anagrafica</legend>
+      <div class="form-row">
+        <div>
+          <label>Nome *</label>
+          <input type="text" name="nome" required value="{{ giocatore.nome if giocatore else '' }}">
+        </div>
+        <div>
+          <label>Cognome *</label>
+          <input type="text" name="cognome" required value="{{ giocatore.cognome if giocatore else '' }}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Nazionalità (ISO3)</label>
+          <input type="text" name="nazionalita" maxlength="3" style="width:90px" value="{{ giocatore.nazionalita if giocatore else '' }}">
+        </div>
+        <div>
+          <label>Data di nascita</label>
+          <input type="date" name="data_nascita" value="{{ giocatore.data_nascita if giocatore else '' }}">
+        </div>
+        <div>
+          <label>Altezza (cm)</label>
+          <input type="number" name="altezza_cm" min="150" max="220" style="width:100px" value="{{ giocatore.altezza_cm if giocatore else '' }}">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Ruolo *</label>
+          <select name="ruolo" required>
+            {% for r in ['Portiere','Difensore','Centrocampista','Attaccante'] %}
+            <option value="{{ r }}" {% if giocatore and giocatore.ruolo == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Piede preferito</label>
+          <select name="piede_preferito">
+            {% for p in ['Destro','Sinistro','Entrambi'] %}
+            <option value="{{ p }}" {% if giocatore and giocatore.piede_preferito == p %}selected{% elif not giocatore and p == 'Destro' %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    {% if modalita == 'nuovo' %}
+    <fieldset>
+      <legend>Tesseramento (Rosa)</legend>
+      <p class="field-hint" style="margin-bottom:0.75rem">Il giocatore viene creato e tesserato in un'unica operazione: se il numero di maglia risulta già occupato, la creazione del giocatore viene annullata (transazione atomica).</p>
+      <div class="form-row">
+        <div>
+          <label>Squadra *</label>
+          <select name="id_squadra" required>
+            {% for s in squadre %}
+            <option value="{{ s.id }}">{{ s.nome }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Stagione *</label>
+          <select name="id_stagione" required>
+            {% for s in all_stagioni %}
+            <option value="{{ s.id }}" {% if loop.first %}selected{% endif %}>{{ s.anno_inizio }}/{{ '%02d'|format(s.anno_fine % 100) }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Numero maglia *</label>
+          <input type="number" name="numero_maglia" min="1" max="99" required style="width:100px">
+        </div>
+      </div>
+    </fieldset>
+    {% endif %}
+
+    <button type="submit" class="btn">{% if modalita == 'nuovo' %}Crea giocatore{% else %}Salva modifiche{% endif %}</button>
+    <a href="{{ url_for('admin_giocatori') }}" class="btn btn-secondary">Annulla</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Gestione – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Pannello di gestione</h2>
+
+<div class="stats-row">
+  <div class="stat-box"><div class="val">{{ conteggi.giocatori }}</div><div class="lbl">Giocatori</div></div>
+  <div class="stat-box"><div class="val">{{ conteggi.squadre }}</div><div class="lbl">Squadre</div></div>
+  <div class="stat-box"><div class="val">{{ conteggi.partite }}</div><div class="lbl">Partite</div></div>
+  <div class="stat-box"><div class="val">{{ conteggi.stagioni }}</div><div class="lbl">Stagioni</div></div>
+</div>
+
+<div class="actions-row">
+  <a href="{{ url_for('admin_giocatore_nuovo') }}" class="btn">+ Nuovo giocatore</a>
+  <a href="{{ url_for('admin_squadra_nuova') }}" class="btn">+ Nuova squadra</a>
+  <a href="{{ url_for('admin_partita_nuova') }}" class="btn">+ Nuova partita</a>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Giocatori modificati di recente</h3>
+    <p class="field-hint" style="margin-bottom:0.75rem">Aggiornato automaticamente dal trigger <code>trg_giocatore_timestamp</code> a ogni modifica.</p>
+    <table>
+      <thead><tr><th>Giocatore</th><th>Ultima modifica</th></tr></thead>
+      <tbody>
+        {% for g in ultimi_modificati %}
+        <tr>
+          <td><a href="{{ url_for('admin_giocatore_modifica', gid=g.id) }}">{{ g.nome }} {{ g.cognome }}</a></td>
+          <td>{{ g.ultima_modifica }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="empty">Nessun giocatore.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Ultime partite inserite</h3>
+    <table>
+      <thead><tr><th>Partita</th><th class="num">Ris.</th></tr></thead>
+      <tbody>
+        {% for p in ultime_partite %}
+        <tr>
+          <td><a href="{{ url_for('admin_partita_dettaglio', pid=p.id) }}">{{ p.sq_casa }} – {{ p.sq_ospite }}</a></td>
+          <td class="num score">{{ p.gol_casa }}–{{ p.gol_ospiti }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="empty">Nessuna partita.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

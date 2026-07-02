@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ pt.sq_casa }} vs {{ pt.sq_ospite }} – Sports Stats{% endblock %}
+{% block content %}
+<h2>{{ pt.sq_casa }} <span class="score">{{ pt.gol_casa }} – {{ pt.gol_ospiti }}</span> {{ pt.sq_ospite }}</h2>
+<p style="color:var(--muted);margin-bottom:1.5rem">
+  {{ pt.data }} · Giornata {{ pt.giornata }} · {{ pt.stage_label }}
+  {% if pt.stadio %} · {{ pt.stadio }}{% endif %}
+  {% if pt.spettatori %} · {{ pt.spettatori }} spettatori{% endif %}
+</p>
+
+<div class="grid-2">
+  <div class="card">
+    <h3><span class="dot" style="background:{{ pt.col_casa }}"></span> {{ pt.sq_casa }}</h3>
+    <table>
+      <thead>
+        <tr><th>Giocatore</th><th class="num">Min</th><th class="num">G</th><th class="num">A</th><th class="num">Tiri</th><th class="num">xG</th></tr>
+      </thead>
+      <tbody>
+        {% for s in stat_casa %}
+        <tr>
+          <td><a href="{{ url_for('giocatore', gid=s.id) }}">{{ s.nome }} {{ s.cognome }}</a></td>
+          <td class="num">{{ s.minuti }}</td>
+          <td class="num">{{ s.gol }}</td>
+          <td class="num">{{ s.assist }}</td>
+          <td class="num">{{ s.tiri }}</td>
+          <td class="num">{{ s.xG }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="margin-top:0.75rem;color:var(--muted);font-size:0.85rem">
+      Totali: {{ tot_casa.gol }} gol · {{ tot_casa.assist }} assist · {{ tot_casa.tiri }} tiri · xG {{ tot_casa.xG }}
+    </p>
+  </div>
+
+  <div class="card">
+    <h3><span class="dot" style="background:{{ pt.col_ospite }}"></span> {{ pt.sq_ospite }}</h3>
+    <table>
+      <thead>
+        <tr><th>Giocatore</th><th class="num">Min</th><th class="num">G</th><th class="num">A</th><th class="num">Tiri</th><th class="num">xG</th></tr>
+      </thead>
+      <tbody>
+        {% for s in stat_ospite %}
+        <tr>
+          <td><a href="{{ url_for('giocatore', gid=s.id) }}">{{ s.nome }} {{ s.cognome }}</a></td>
+          <td class="num">{{ s.minuti }}</td>
+          <td class="num">{{ s.gol }}</td>
+          <td class="num">{{ s.assist }}</td>
+          <td class="num">{{ s.tiri }}</td>
+          <td class="num">{{ s.xG }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="margin-top:0.75rem;color:var(--muted);font-size:0.85rem">
+      Totali: {{ tot_ospite.gol }} gol · {{ tot_ospite.assist }} assist · {{ tot_ospite.tiri }} tiri · xG {{ tot_ospite.xG }}
+    </p>
+  </div>
+</div>
+{% endblock %}

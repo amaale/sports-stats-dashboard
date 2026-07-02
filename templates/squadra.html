@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}{{ sq.nome }} – Sports Stats{% endblock %}
+{% block content %}
+<h2><span class="dot" style="background:{{ sq.colore_primario }};width:16px;height:16px"></span> {{ sq.nome }}</h2>
+<p style="color:var(--muted);margin-bottom:1rem">{{ sq.citta }} · {{ sq.stadio or '—' }} · fondata {{ sq.anno_fondazione or '—' }}</p>
+
+<div class="stagione-select">
+  <form method="get">
+    <label>Stagione:
+      <select name="stagione" onchange="this.form.submit()">
+        {% for s in all_stagioni %}
+        <option value="{{ s.id }}" {% if s.id == stagione.id %}selected{% endif %}>{{ s.anno_inizio }}/{{ '%02d'|format(s.anno_fine % 100) }} · {{ s.campionato }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+</div>
+
+{% if stats_sq %}
+<div class="stats-row">
+  <div class="stat-box"><div class="val">{{ stats_sq.punti }}</div><div class="lbl">Punti</div></div>
+  <div class="stat-box"><div class="val">{{ stats_sq.v }}-{{ stats_sq.n }}-{{ stats_sq.s }}</div><div class="lbl">V-N-P</div></div>
+  <div class="stat-box"><div class="val">{{ stats_sq.gf }}:{{ stats_sq.gs }}</div><div class="lbl">GF:GS</div></div>
+  {% if forma %}
+  <div class="stat-box">
+    <div class="val">
+      {% for f in forma %}<span class="badge badge-{{ f|lower }}">{{ f }}</span>{% endfor %}
+    </div>
+    <div class="lbl">Forma (ultime 5)</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Rosa {{ stagione.anno_inizio }}/{{ '%02d'|format(stagione.anno_fine % 100) }}</h3>
+  <table>
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Giocatore</th>
+        <th>Ruolo</th>
+        <th class="num">Pres.</th>
+        <th class="num">Gol</th>
+        <th class="num">Assist</th>
+        <th class="num">Min ø</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in rosa %}
+      <tr>
+        <td class="num">{{ g.numero_maglia or '—' }}</td>
+        <td><a href="{{ url_for('giocatore', gid=g.id) }}">{{ g.nome }} {{ g.cognome }}</a></td>
+        <td>{{ g.ruolo }}</td>
+        <td class="num">{{ g.presenze }}</td>
+        <td class="num">{{ g.gol }}</td>
+        <td class="num">{{ g.assist }}</td>
+        <td class="num">{{ g.min_medi }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Partite</h3>
+  <table>
+    <thead><tr><th>Data</th><th>G</th><th>Partita</th><th class="num">Ris.</th></tr></thead>
+    <tbody>
+      {% for p in partite %}
+      <tr>
+        <td>{{ p.data }}</td>
+        <td class="num">{{ p.giornata }}</td>
+        <td><a href="{{ url_for('partita', pid=p.id) }}">{{ p.sq_casa }} – {{ p.sq_ospite }}</a></td>
+        <td class="num score">{{ p.gol_casa }}–{{ p.gol_ospiti }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

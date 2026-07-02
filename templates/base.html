@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Sports Stats{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --border: #2d3a4f;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #3ecf8e;
+      --win: #3ecf8e;
+      --draw: #f0b429;
+      --loss: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    header h1 a { color: var(--text); text-decoration: none; }
+    nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    nav a { color: var(--muted); font-size: 0.95rem; }
+    nav a:hover { color: var(--accent); text-decoration: none; }
+    .search-form { margin-left: auto; display: flex; gap: 0.5rem; }
+    .search-form input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      width: 180px;
+    }
+    .search-form button {
+      background: var(--accent);
+      color: #0f1419;
+      border: none;
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+    h3 { font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--muted); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .num { text-align: center; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-v { background: var(--win); color: #0f1419; }
+    .badge-p { background: var(--loss); color: #fff; }
+    .badge-n { background: var(--draw); color: #0f1419; }
+    .stats-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      min-width: 120px;
+    }
+    .stat-box .val { font-size: 1.75rem; font-weight: 700; color: var(--accent); }
+    .stat-box .lbl { font-size: 0.8rem; color: var(--muted); }
+    .stagione-select { margin-bottom: 1.5rem; }
+    .stagione-select select {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+    }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .score { font-weight: 700; font-size: 1.1rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+    .empty { color: var(--muted); font-style: italic; padding: 1rem 0; }
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: end; margin-bottom: 1.5rem; }
+    .form-row label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.3rem; }
+    .form-row select, .form-row button {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+    }
+    .form-row button { background: var(--accent); color: #0f1419; border: none; cursor: pointer; font-weight: 600; }
+    .form-row input[type=text], .form-row input[type=number], .form-row input[type=date], .form-row input[type=password] {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+    }
+    .btn { display: inline-block; background: var(--accent); color: #0f1419; border: none;
+           padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+    .btn:hover { opacity: 0.9; text-decoration: none; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-danger { background: transparent; color: var(--loss); border: 1px solid var(--loss); }
+    .btn-danger:hover { background: var(--loss); color: #fff; }
+    .btn-sm { padding: 0.3rem 0.65rem; font-size: 0.8rem; }
+    .actions-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .flash { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; border: 1px solid transparent; }
+    .flash-success { background: rgba(62,207,142,0.12); border-color: var(--win); color: var(--win); }
+    .flash-error   { background: rgba(239,68,68,0.12); border-color: var(--loss); color: #ff8080; }
+    .admin-badge { font-size: 0.75rem; background: var(--accent); color: #0f1419; padding: 0.1rem 0.5rem; border-radius: 4px; font-weight: 700; margin-left: 0.4rem; }
+    .field-hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+    fieldset { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem; }
+    legend { color: var(--muted); font-size: 0.85rem; padding: 0 0.4rem; text-transform: uppercase; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <h1><a href="{{ url_for('index') }}">⚽ Sports Stats</a></h1>
+    <nav>
+      <a href="{{ url_for('index') }}">Classifica</a>
+      <a href="{{ url_for('marcatori') }}">Marcatori</a>
+      <a href="{{ url_for('confronto') }}">Confronto</a>
+      {% if session.user_id %}
+      <a href="{{ url_for('admin_dashboard') }}">Gestione<span class="admin-badge">admin</span></a>
+      {% else %}
+      <a href="{{ url_for('admin_login') }}">Accedi</a>
+      {% endif %}
+    </nav>
+    <form class="search-form" action="{{ url_for('cerca') }}" method="get">
+      <input type="text" name="q" placeholder="Cerca giocatore o squadra…">
+      <button type="submit">Cerca</button>
+    </form>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

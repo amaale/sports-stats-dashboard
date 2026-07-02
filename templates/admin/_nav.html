@@ -1,0 +1,11 @@
+<div class="actions-row" style="margin-bottom:1rem">
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary btn-sm">Dashboard</a>
+  <a href="{{ url_for('admin_giocatori') }}" class="btn btn-secondary btn-sm">Giocatori</a>
+  <a href="{{ url_for('admin_squadre') }}" class="btn btn-secondary btn-sm">Squadre</a>
+  <a href="{{ url_for('admin_partite') }}" class="btn btn-secondary btn-sm">Partite</a>
+  <span style="flex:1"></span>
+  <span style="color:var(--muted);font-size:0.85rem;align-self:center">{{ session.username }}</span>
+  <form method="post" action="{{ url_for('admin_logout') }}" style="display:inline">
+    <button type="submit" class="btn btn-secondary btn-sm">Esci</button>
+  </form>
+</div>

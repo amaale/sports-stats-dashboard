@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Marcatori – Sports Stats{% endblock %}
+{% block content %}
+<h2>Marcatori – {{ stagione.anno_inizio }}/{{ '%02d'|format(stagione.anno_fine % 100) }}</h2>
+
+<div class="stagione-select">
+  <form method="get">
+    <label>Stagione:
+      <select name="stagione" onchange="this.form.submit()">
+        {% for s in all_stagioni %}
+        <option value="{{ s.id }}" {% if s.id == stagione.id %}selected{% endif %}>{{ s.anno_inizio }}/{{ '%02d'|format(s.anno_fine % 100) }} · {{ s.campionato }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Classifica gol</h3>
+  <table>
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Giocatore</th>
+        <th>Squadra</th>
+        <th class="num">Gol</th>
+        <th class="num">Assist</th>
+        <th class="num">xG</th>
+        <th class="num">Pres.</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in top_gol %}
+      <tr>
+        <td class="num">{{ g.pos }}</td>
+        <td><a href="{{ url_for('giocatore', gid=g.id) }}">{{ g.nome }} {{ g.cognome }}</a></td>
+        <td><span class="dot" style="background:{{ g.colore_primario }}"></span><a href="{{ url_for('squadra', sid=g.id_sq) }}">{{ g.squadra }}</a></td>
+        <td class="num"><strong>{{ g.gol }}</strong></td>
+        <td class="num">{{ g.assist }}</td>
+        <td class="num">{{ g.xg }}</td>
+        <td class="num">{{ g.presenze }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="empty">Nessun marcatore.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Top assist</h3>
+    <table>
+      <thead><tr><th>Giocatore</th><th>Squadra</th><th class="num">Assist</th><th class="num">Gol</th></tr></thead>
+      <tbody>
+        {% for g in top_assist %}
+        <tr>
+          <td><a href="{{ url_for('giocatore', gid=g.id) }}">{{ g.nome }} {{ g.cognome }}</a></td>
+          <td>{{ g.squadra }}</td>
+          <td class="num"><strong>{{ g.assist }}</strong></td>
+          <td class="num">{{ g.gol }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">Nessun assist.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Senza gol né assist (≥3 presenze)</h3>
+    <table>
+      <thead><tr><th>Giocatore</th><th>Ruolo</th><th>Squadra</th><th class="num">Pres.</th></tr></thead>
+      <tbody>
+        {% for g in senza_contributo %}
+        <tr>
+          <td>{{ g.nome }} {{ g.cognome }}</td>
+          <td>{{ g.ruolo }}</td>
+          <td>{{ g.squadra }}</td>
+          <td class="num">{{ g.presenze }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="empty">Nessuno.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

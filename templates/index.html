@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Classifica – Sports Stats{% endblock %}
+{% block content %}
+<h2>Stagione {{ stagione.anno_inizio }}/{{ '%02d'|format(stagione.anno_fine % 100) }}</h2>
+
+<div class="stagione-select">
+  <form method="get">
+    <label>Stagione:
+      <select name="stagione" onchange="this.form.submit()">
+        {% for s in all_stagioni %}
+        <option value="{{ s.id }}" {% if s.id == stagione.id %}selected{% endif %}>{{ s.anno_inizio }}/{{ '%02d'|format(s.anno_fine % 100) }} · {{ s.campionato }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </form>
+</div>
+
+<div class="stats-row">
+  <div class="stat-box"><div class="val">{{ n_partite }}</div><div class="lbl">Partite</div></div>
+  <div class="stat-box"><div class="val">{{ n_gol }}</div><div class="lbl">Gol totali</div></div>
+  <div class="stat-box"><div class="val">{{ classifica|length }}</div><div class="lbl">Squadre</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Classifica</h3>
+    <table>
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Squadra</th>
+          <th class="num">PG</th>
+          <th class="num">V</th>
+          <th class="num">N</th>
+          <th class="num">P</th>
+          <th class="num">GF</th>
+          <th class="num">GS</th>
+          <th class="num">DR</th>
+          <th class="num">Pt</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in classifica %}
+        <tr>
+          <td class="num">{{ loop.index }}</td>
+          <td><a href="{{ url_for('squadra', sid=r.id) }}">{{ r.nome }}</a></td>
+          <td class="num">{{ r.pg }}</td>
+          <td class="num">{{ r.v }}</td>
+          <td class="num">{{ r.n }}</td>
+          <td class="num">{{ r.s }}</td>
+          <td class="num">{{ r.gf }}</td>
+          <td class="num">{{ r.gs }}</td>
+          <td class="num">{{ r.diff }}</td>
+          <td class="num"><strong>{{ r.punti }}</strong></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Ultime partite</h3>
+    {% if ultime %}
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Partita</th><th class="num">Ris.</th></tr>
+      </thead>
+      <tbody>
+        {% for p in ultime %}
+        <tr>
+          <td>{{ p.data }}</td>
+          <td>
+            <a href="{{ url_for('partita', pid=p.id) }}">
+              {{ p.sq_casa }} – {{ p.sq_ospite }}
+            </a>
+          </td>
+          <td class="num score">{{ p.gol_casa }}–{{ p.gol_ospiti }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nessuna partita.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h3>Punti per squadra <span style="font-weight:400;font-size:0.8rem;color:var(--muted)">(via /api/classifica – JSON)</span></h3>
+  <canvas id="punti-chart" height="70"></canvas>
+</div>
+{% endblock %}
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+<script>
+fetch('{{ url_for("api_classifica", sid=stagione.id) }}')
+  .then(r => r.json())
+  .then(dati => {
+    new Chart(document.getElementById('punti-chart'), {
+      type: 'bar',
+      data: {
+        labels: dati.map(d => d.nome),
+        datasets: [{ label: 'Punti', data: dati.map(d => d.punti), backgroundColor: '#3ecf8e' }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#8b9cb3' }, grid: { color: '#2d3a4f' } },
+          y: { ticks: { color: '#8b9cb3' }, grid: { color: '#2d3a4f' }, beginAtZero: true }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

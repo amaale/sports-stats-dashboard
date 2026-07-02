@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Cerca{% if q %}: {{ q }}{% endif %} – Sports Stats{% endblock %}
+{% block content %}
+<h2>Cerca</h2>
+
+<form class="form-row" method="get">
+  <div>
+    <label>Nome giocatore o squadra</label>
+    <input type="text" name="q" value="{{ q }}" style="background:var(--card);border:1px solid var(--border);color:var(--text);padding:0.5rem 0.75rem;border-radius:6px;width:260px">
+  </div>
+  <button type="submit">Cerca</button>
+</form>
+
+{% if q %}
+<div class="grid-2">
+  <div class="card">
+    <h3>Giocatori</h3>
+    {% if giocatori %}
+    <table>
+      <thead><tr><th>Nome</th><th>Ruolo</th><th>Squadra</th></tr></thead>
+      <tbody>
+        {% for g in giocatori %}
+        <tr>
+          <td><a href="{{ url_for('giocatore', gid=g.id) }}">{{ g.nome }} {{ g.cognome }}</a></td>
+          <td>{{ g.ruolo }}</td>
+          <td>{{ g.squadra or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nessun giocatore trovato.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Squadre</h3>
+    {% if squadre %}
+    <table>
+      <thead><tr><th>Nome</th><th>Città</th><th>Stadio</th></tr></thead>
+      <tbody>
+        {% for s in squadre %}
+        <tr>
+          <td><a href="{{ url_for('squadra', sid=s.id) }}">{{ s.nome }}</a></td>
+          <td>{{ s.citta }}</td>
+          <td>{{ s.stadio or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">Nessuna squadra trovata.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

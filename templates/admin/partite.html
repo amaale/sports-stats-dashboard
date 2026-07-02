@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Gestione partite – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Partite</h2>
+<div class="actions-row">
+  <a href="{{ url_for('admin_partita_nuova') }}" class="btn">+ Nuova partita</a>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr><th>Data</th><th>Stagione</th><th>Partita</th><th class="num">Ris.</th><th class="num">Tabellino</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for p in partite %}
+      <tr>
+        <td>{{ p.data }}</td>
+        <td>{{ p.stagione_label }}</td>
+        <td><a href="{{ url_for('admin_partita_dettaglio', pid=p.id) }}">{{ p.sq_casa }} – {{ p.sq_ospite }}</a></td>
+        <td class="num score">{{ p.gol_casa }}–{{ p.gol_ospiti }}</td>
+        <td class="num">{{ p.n_statistiche }} righe</td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('admin_partita_dettaglio', pid=p.id) }}" class="btn btn-secondary btn-sm">Apri</a>
+          <form method="post" action="{{ url_for('admin_partita_elimina', pid=p.id) }}" style="display:inline"
+                onsubmit="return confirm('Eliminare questa partita e tutte le statistiche collegate? Azione irreversibile.');">
+            <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">Nessuna partita.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

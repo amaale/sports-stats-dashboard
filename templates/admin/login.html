@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Accedi – Sports Stats{% endblock %}
+{% block content %}
+<h2>Area di gestione</h2>
+<div class="card" style="max-width:360px">
+  <form method="post">
+    <div class="form-row" style="flex-direction:column;align-items:stretch">
+      <div>
+        <label>Username</label>
+        <input type="text" name="username" required autofocus style="width:100%">
+      </div>
+      <div>
+        <label>Password</label>
+        <input type="password" name="password" required style="width:100%">
+      </div>
+      <button type="submit" class="btn" style="margin-top:0.5rem">Accedi</button>
+    </div>
+  </form>
+  <p class="field-hint" style="margin-top:1rem">Credenziali demo: <code>admin</code> / <code>admin123</code></p>
+</div>
+{% endblock %}

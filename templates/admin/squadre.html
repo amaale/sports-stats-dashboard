@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Gestione squadre – Sports Stats{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h2>Squadre</h2>
+<div class="actions-row">
+  <a href="{{ url_for('admin_squadra_nuova') }}" class="btn">+ Nuova squadra</a>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr><th>Squadra</th><th>Città</th><th>Stadio</th><th class="num">Fondata</th><th class="num">Partite</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for s in squadre %}
+      <tr>
+        <td><span class="dot" style="background:{{ s.colore_primario }}"></span>{{ s.nome }}</td>
+        <td>{{ s.citta }}</td>
+        <td>{{ s.stadio or '—' }}</td>
+        <td class="num">{{ s.anno_fondazione or '—' }}</td>
+        <td class="num">{{ s.n_partite }}</td>
+        <td style="white-space:nowrap">
+          <a href="{{ url_for('admin_squadra_modifica', sid=s.id) }}" class="btn btn-secondary btn-sm">Modifica</a>
+          <form method="post" action="{{ url_for('admin_squadra_elimina', sid=s.id) }}" style="display:inline"
+                onsubmit="return confirm('Eliminare {{ s.nome }}? Possibile solo se non ha partite collegate.');">
+            <button type="submit" class="btn btn-danger btn-sm">Elimina</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="empty">Nessuna squadra.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
